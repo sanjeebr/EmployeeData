@@ -101,6 +101,7 @@ class CsvOperationsController extends Controller
 
                 foreach ($employee_data as $key => $value) {
                     if(preg_match($regex, $key) && '' != $value) {
+                        $value = strip_tags($value);
                         $skill = Skill::firstOrCreate(array('name' => $value));
                         $skill->save();
                         $employee_skill = new EmpSkill;
