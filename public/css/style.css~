@@ -4,6 +4,7 @@ body{
 }
 p, input, textarea{
 	font-family: 'Lora', serif;
+	width: 100%;
 }
 
 /****************
@@ -54,14 +55,14 @@ a:focus{
 	position: absolute;
 	right: 15px;
 	top: 15px;
-	font-size: 30px;
+	font-size: 40px;
 	color: #fff;
 }
 
 .menu{
 	width: 300px;
 	display: block;
-	background: #333;
+	background: #fa5c58;
 	height: 100%;
 	top: 0;
 	right: -300px;
@@ -84,6 +85,7 @@ a:focus{
 .menu h3{
 	margin-top:50px;
 	text-transform: uppercase;
+	font-size: 40px;
 }
 
 .menu .nav{
@@ -91,13 +93,14 @@ a:focus{
 }
 
 .menu .nav > li > a{
+	font-size: 30px;
 	color: #fff;
 }
 
 .menu .nav > li > a:hover,
 .menu .nav > li > a:focus{
 	background: transparent;
-	color: #fa694e;
+	color: #333;
 }
 
 .menu .social-icons{
@@ -126,7 +129,7 @@ a:focus{
 
 .jumbotron{
 	text-align: center;
-	background: url('../img/bg.jpg') no-repeat center center;
+	background: url('') no-repeat center center;
 	background-size: cover;
 	color: #fff;
    -webkit-background-size: cover;
@@ -135,8 +138,9 @@ a:focus{
   width: 100%;
 }
 .door{
-	margin-top: 3%;
+	margin-top: 1%;
 }
+
 
 .jumbotron .mask{
 	position: absolute;
@@ -256,6 +260,10 @@ ul.social-icons > li > a{
 	background: #fff;
 	display: block;
 	text-align: center;
+}
+
+.fa, h4{
+	color: #eee;
 }
 
 

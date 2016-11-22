@@ -1,9 +1,8 @@
 @extends ('layout.employee')
 
-@section('content')
-
+@section('content1')
     <div class="panel panel-default">
-        <div class="panel-heading">Expense Forms</div>
+        <div class="panel-heading">Employee</div>
         <div class="panel-body">
 
             <br/><br/>
@@ -11,9 +10,14 @@
                 <table class="table table-bordered table-hover" id="users-table">
                     <thead>
                         <tr>
-                            <th>EmpId</th>
-                            <th>Name</th>
-                            <th>Last</th>
+                            <th>Emp Id</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Skills</th>
+                            <th>Stack Id</th>
+                            <th>Stack Nickname</th>
+                            <th>Created By</th>
+                            <th>Updated By</th>
                         </tr>
                     </thead>
                 </table>

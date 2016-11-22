@@ -15,16 +15,10 @@ $('#users-table').DataTable({
         { data: 'emp_id', name: 'emp_id'},
         { data: 'first_name', name: 'first_name' },
         { data: 'last_name', name: 'last_name' },
+	{ data: 'skills_name', name: 'skills_name', orderable: false},
+	{ data: 'stack_id', name: 'stack_id' },
+        { data: 'stack_nickname', name: 'stack_nickname' },
+	{ data: 'created_by_name', name: 'created_by_name' },
+        { data: 'updated_by_name', name: 'updated_by_name' },
     ],
-
-    initComplete: function () {
-        this.api().columns().every(function () {
-            var column = this;
-            var input = document.createElement("input");
-            $(input).appendTo($(column.footer()).empty())
-            .on('change', function () {
-                column.search($(this).val()).draw();
-            });
-        });
-    }
 });

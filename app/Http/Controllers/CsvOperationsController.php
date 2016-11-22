@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use Illuminate\Support\Facades\DB;
+
 use Carbon\Carbon;
 
 use App\Employee;
@@ -21,6 +23,7 @@ use Yajra\Datatables\Datatables;
 class CsvOperationsController extends Controller
 {
 
+
     public function home()
     {
         return view('home');
@@ -28,20 +31,23 @@ class CsvOperationsController extends Controller
 
     public function datatable()
     {
-        $forms = Employee::get();
-        var_dump($forms);exit;
         return view('datatable');
+    }
+
+    public function graph()
+    {
+        return view('graphs');
     }
 
     public function upload(Request $request)
     {
-        // $array = array_map('str_getcsv', str_replace(';', ',', file('Test - Parse Sheet.csv')));
-        // $header = array_shift($array);
-        // array_walk($array,array($this, '_combine_array'), $header);
+        $this->validate($request, [
+                'files' => 'required|mimes:csv,txt'
+            ]);
+
         if ($request->hasFile('files'))
         {
             $file            = $request->file('files');
-            $file_extension  = $file->getClientOriginalExtension();
             $size            = $file->getSize();
             $mytime = Carbon::now();
             if (3145728 < $size)
@@ -58,30 +64,40 @@ class CsvOperationsController extends Controller
             $regex = "/^(Skill)\d+/";
             foreach ($header as $column_name) {
                 if( 'EmpID' !== $column_name && 'Name' !== $column_name && 'Last' !== $column_name && 'StackID' !== $column_name && 'StackNickname' !== $column_name && 'CreatedBy' !== $column_name && 'UpdatedBy' !== $column_name && ! preg_match($regex, $column_name)) {
-
+                    return view('home')->with('error', 'Undefined Column Name');
                 }
             }
             array_walk($array,array($this, '_combine_array'), $header);
 
             foreach ($array as $employee_data) {
-                $created_by = Hr::firstOrCreate(array('name' => strip_tags($employee_data['CreatedBy'])));
+
+                    $created_by = Hr::firstOrCreate(array('name' => strip_tags($employee_data['CreatedBy'])));
+                    $updated_by = Hr::firstOrCreate(array('name' => strip_tags($employee_data['UpdatedBy'])));
+
+                try {
+                    $employee = new Employee;
+                    $employee->emp_id = strip_tags($employee_data['EmpID']);
+                    $employee->first_name = strip_tags($employee_data['Name']);
+                    $employee->last_name = strip_tags($employee_data['Last']);
+                    $employee->created_by = $created_by->id;
+                    $employee->updated_by = $updated_by->id;
+                    $employee->save();
+                } catch (\Exception $e) {
+                    return view('home')->with('error', 'EmpID - ' . strip_tags($employee_data['EmpID']) . ' is repeated');
+                }
+
+                try {
+                    $stack = new Stack;
+                    $stack->stack_id = strip_tags($employee_data['StackID']);
+                    $stack->employee_id = $employee->id;
+                    $stack->name = strip_tags($employee_data['StackNickname']);
+                    $stack->save();
+                } catch (\Exception $e) {
+                    return view('home')->with('error', 'StackID - ' . strip_tags($employee_data['StackID']) . ' is repeated');
+                }
+
                 $created_by->save();
-                $updated_by = Hr::firstOrCreate(array('name' => strip_tags($employee_data['UpdatedBy'])));
                 $updated_by->save();
-
-                $employee = new Employee;
-                $employee->emp_id = strip_tags($employee_data['EmpID']);
-                $employee->first_name = strip_tags($employee_data['Name']);
-                $employee->last_name = strip_tags($employee_data['Last']);
-                $employee->created_by = $created_by->id;
-                $employee->updated_by = $updated_by->id;
-                $employee->save();
-
-                $stack = new Stack;
-                $stack->stack_id = strip_tags($employee_data['StackID']);
-                $stack->employee_id = $employee->id;
-                $stack->name = strip_tags($employee_data['StackNickname']);
-                $stack->save();
 
                 foreach ($employee_data as $key => $value) {
                     if(preg_match($regex, $key) && '' != $value) {
@@ -93,7 +109,6 @@ class CsvOperationsController extends Controller
                         $employee_skill->save();
                     }
                 }
-
             }
             return view('datatable');
         }
@@ -114,10 +129,17 @@ class CsvOperationsController extends Controller
      */
     public function datatableindex()
     {
+        $emp_data = DB::table('employees')
+            ->leftJoin('hr', 'employees.created_by', '=', 'hr.id')
+            ->leftJoin('hr as hr_updated_by', 'employees.updated_by', '=', 'hr_updated_by.id')
+            ->leftJoin('stacks', 'employees.id', '=', 'stacks.employee_id')
+            ->join('emp_skills', 'employees.id', '=', 'emp_skills.employee_id')
+            ->join('skills', 'skills.id', '=', 'emp_skills.skill_id')
+            ->select('employees.id', 'employees.emp_id', 'employees.first_name', 'employees.last_name', 'hr.name as created_by_name', 'hr_updated_by.name as updated_by_name', 'stacks.name as stack_nickname', 'stacks.stack_id as stack_id', DB::raw('GROUP_CONCAT(DISTINCT skills.name) as skills_name'))
+            ->groupBy('employees.id', 'employees.emp_id', 'employees.first_name', 'employees.last_name', 'hr.name', 'hr_updated_by.name', 'stacks.name', 'stacks.stack_id')
+            ->get();
 
-        $forms = Employee::get();
-
-        return Datatables::of($forms);
+        return Datatables::of($emp_data)->make(true);
     }
 
 }

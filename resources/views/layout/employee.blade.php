@@ -35,24 +35,52 @@
             <a href="#" class="close"><i class="fa fa-close"></i></a>
             <h3>Menu</h3>
             <ul class="nav">
-                <li><a data-scroll href="#home">Home</a></li>
-                <li><a data-scroll href="#services">Statistics</a></li>
-                <li><a data-scroll href="#portfolio">User data</a></li>
+                <li><a href="{{ url('/') }}">Home</a></li>
+                <li><a  href="{{ url('/datatable') }}">User data</a></li>
+                <li><a  href="{{ url('/graph') }}">Statistics</a></li>
             </ul>
         </nav>
 
-        <div class="container">
-            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                @yield('content')
-
+         <section>
+           <div class="col-lg-6 col-lg-offset-3 col-md-2 col-sm-12 col-xs-12">
+                     <div class="col-lg-4 col-md-2 col-sm-2 col-xs-4">
+                          <div class="">
+                               <a href="{{ url('/') }}" >
+                          <i class="fa fa-upload fa-5x"></i>
+                          <h4>upload</h4>
+                          </a>
+                          </div>
+                      </div>
+                       <div class="col-lg-4 col-md-2 col-sm-2 col-xs-4">
+                          <div class="">
+                               <a href="{{ url('/datatable') }}" >
+                         <i class="fa fa-table fa-5x" aria-hidden="true"></i>
+                          <h4>table</h4>
+                          </a>
+                          </div>
+                      </div>
+                       <div class="col-lg-4 col-md-2 col-sm-2 col-xs-4">
+                          <div class="">
+                               <a href="{{ url('/graph') }}" >
+                          <i class="fa fa-pie-chart fa-5x"></i>
+                          <h4>graphs</h4>
+                          </a>
+                          </div>
+                      </div>
             </div>
-        </div>
+        </section>
+        @yield('content')
+    </div>
+    <div class="container-fluid">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            @yield('content1')
 
+        </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js" integrity="sha384-I6F5OKECLVtK/BL+8iSLDEHowSAfUo76ZL9+kGAgTRdiByINKJaqTPH/QVNS1VDb" crossorigin="anonymous"></script>
     <script src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.12/js/dataTables.bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/1.10.12/js/dataTables.bootstrap.min.js"></script>
     <script type="text/javascript" src="{{ asset('js/app.js?v=1.0')}}"></script>
     @yield('bottom')
 </body>
