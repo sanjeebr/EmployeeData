@@ -12,7 +12,7 @@
 */
 
 Route::get('/', ['as' => 'instert','uses' => 'CsvOperationsController@home']);
-Route::post('/', ['as' => 'upload','uses' => 'CsvOperationsController@upload']);
+Route::post('/upload', ['as' => 'upload','uses' => 'CsvOperationsController@upload']);
 
 Route::get('/datatable', ['as' => 'datatable_page','uses' => 'CsvOperationsController@datatable']);
 Route::post('/datatable', ['as' => 'datatable','uses' => 'CsvOperationsController@datatableindex']);

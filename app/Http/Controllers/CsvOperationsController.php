@@ -104,9 +104,7 @@ class CsvOperationsController extends Controller
                         $value = strip_tags($value);
                         $skill = Skill::firstOrCreate(array('name' => $value));
                         $skill->save();
-                        $employee_skill = new EmpSkill;
-                        $employee_skill->employee_id = $employee->id;
-                        $employee_skill->skill_id = $skill->id;
+                        $employee_skill = EmpSkill::firstOrCreate(array('employee_id' => $employee->id, 'skill_id' => $skill->id));
                         $employee_skill->save();
                     }
                 }
