@@ -83,8 +83,10 @@ class CsvOperationsController extends Controller
                 return back()->withInput()->withErrors(array('error' => 'Some column are missing/extra'));
             }
 
+
             array_walk($array,array($this, '_combine_array'), $header);
 
+            DB::beginTransaction();
             foreach ($array as $employee_data) {
 
                     $created_by = Hr::firstOrCreate(array('name' => strip_tags($employee_data['CreatedBy'])));
@@ -99,7 +101,7 @@ class CsvOperationsController extends Controller
                     $employee->updated_by = $updated_by->id;
                     $employee->save();
                 } catch (\Exception $e) {
-
+                    DB::rollback();
                     return back()->withInput()->withErrors(array('error' => 'EmpID - ' . strip_tags($employee_data['EmpID']) . ' is repeated'));
                 }
 
@@ -110,6 +112,7 @@ class CsvOperationsController extends Controller
                     $stack->name = strip_tags($employee_data['StackNickname']);
                     $stack->save();
                 } catch (\Exception $e) {
+                    DB::rollback();
                     return back()->withInput()->withErrors(array('error' => 'StackID - ' . strip_tags($employee_data['StackID']) . ' is repeated'));
                 }
 
@@ -126,9 +129,9 @@ class CsvOperationsController extends Controller
                     }
                 }
             }
+            DB::commit();
             return redirect()->route('datatable_page');
         }
-
     }
 
     private function _combine_array(&$row, $key, $header)
@@ -157,5 +160,4 @@ class CsvOperationsController extends Controller
 
         return Datatables::of($emp_data)->make(true);
     }
-
 }
