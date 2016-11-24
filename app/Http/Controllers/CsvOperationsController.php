@@ -36,6 +36,7 @@ class CsvOperationsController extends Controller
 
     public function graph()
     {
+
         return view('graphs');
     }
 
@@ -52,7 +53,7 @@ class CsvOperationsController extends Controller
             $mytime = Carbon::now();
             if (3145728 < $size)
             {
-                return response('oversize');
+                return back()->withInput()->withErrors(array('error' => 'Size more than 3MB'));
             }
 
             $path = base_path() . '/public/uploads/';
@@ -62,11 +63,26 @@ class CsvOperationsController extends Controller
             $array = array_map('str_getcsv', str_replace(';', ',', file('uploads/' . $file_name)));
             $header = array_shift($array);
             $regex = "/^(Skill)\d+/";
+            $col_no = 0;
+            $col_name = array('EmpID', 'Name', 'Last', 'StackID', 'StackNickname', 'CreatedBy', 'UpdatedBy');
+            $unique_column = array_unique($header);
+
+            if (count($unique_column) !== count($header)) {
+                return back()->withInput()->withErrors(array('error' => 'Some column are repeated'));
+            }
+
             foreach ($header as $column_name) {
-                if( 'EmpID' !== $column_name && 'Name' !== $column_name && 'Last' !== $column_name && 'StackID' !== $column_name && 'StackNickname' !== $column_name && 'CreatedBy' !== $column_name && 'UpdatedBy' !== $column_name && ! preg_match($regex, $column_name)) {
-                    return view('home')->with('error', 'Undefined Column Name');
+                if( ! in_array( $column_name, $col_name, TRUE) && ! preg_match($regex, $column_name)) {
+                    return back()->withInput()->withErrors(array('error' => 'Undefined Column Name'));
+                } else if (in_array( $column_name, $col_name, TRUE)) {
+                    $col_no++;
                 }
             }
+
+            if (7 !== $col_no) {
+                return back()->withInput()->withErrors(array('error' => 'Some column are missing/extra'));
+            }
+
             array_walk($array,array($this, '_combine_array'), $header);
 
             foreach ($array as $employee_data) {
@@ -83,7 +99,8 @@ class CsvOperationsController extends Controller
                     $employee->updated_by = $updated_by->id;
                     $employee->save();
                 } catch (\Exception $e) {
-                    return view('home')->with('error', 'EmpID - ' . strip_tags($employee_data['EmpID']) . ' is repeated');
+
+                    return back()->withInput()->withErrors(array('error' => 'EmpID - ' . strip_tags($employee_data['EmpID']) . ' is repeated'));
                 }
 
                 try {
@@ -93,7 +110,7 @@ class CsvOperationsController extends Controller
                     $stack->name = strip_tags($employee_data['StackNickname']);
                     $stack->save();
                 } catch (\Exception $e) {
-                    return view('home')->with('error', 'StackID - ' . strip_tags($employee_data['StackID']) . ' is repeated');
+                    return back()->withInput()->withErrors(array('error' => 'StackID - ' . strip_tags($employee_data['StackID']) . ' is repeated'));
                 }
 
                 $created_by->save();
@@ -109,7 +126,7 @@ class CsvOperationsController extends Controller
                     }
                 }
             }
-            return view('datatable');
+            return redirect()->route('datatable_page');
         }
 
     }
